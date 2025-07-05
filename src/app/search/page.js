@@ -5,9 +5,9 @@ import { SearchForm } from "@/components/SearchForm";
 import { ZatsugakuCard } from "@/components/ZatsugakuCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-export default function SearchPage() {
+function SearchPageContent() {
     const searchParams = useSearchParams();
     const query = searchParams.get("q") || "";
     const { supabase } = useAuth();
@@ -79,5 +79,24 @@ export default function SearchPage() {
                 )}
             </main>
         </div>
+    );
+}
+
+export default function SearchPage() {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen bg-gray-50">
+                    <Header />
+                    <main className="container mx-auto px-4 py-8">
+                        <div className="text-center">
+                            <p className="text-gray-500">読み込み中...</p>
+                        </div>
+                    </main>
+                </div>
+            }
+        >
+            <SearchPageContent />
+        </Suspense>
     );
 }
