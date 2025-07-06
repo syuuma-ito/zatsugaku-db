@@ -18,7 +18,6 @@ export default function ColorPicker({ color, onColorChange, disabled = false }) 
                 >
                     <div className="w-4 h-4 rounded border border-white"></div>
                 </button>
-                <span className="text-sm text-gray-600">{color}</span>
             </div>
 
             {isOpen && (

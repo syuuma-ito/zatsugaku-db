@@ -2,11 +2,10 @@
 
 import { useAuth } from "@/contexts/AuthContext";
 import { getTextColor } from "@/lib/utils";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import ColorPicker from "./ColorPicker";
-import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
@@ -102,20 +101,18 @@ export function TagSelector({ selectedTags = [], onTagsChange, allowCreate = tru
             {selectedTags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                     {selectedTags.map((tag) => (
-                        <Badge
+                        <button
                             key={tag.id}
-                            variant="secondary"
-                            className="flex items-center gap-1"
+                            type="button"
+                            onClick={() => toggleTag(tag)}
+                            className="px-3 py-1 rounded-full text-sm border border-gray-300 hover:border-gray-500 transition-colors"
                             style={{
                                 backgroundColor: tag.color || "#c7c7c7",
                                 color: getTextColor(tag.color || "#c7c7c7"),
                             }}
                         >
-                            {tag.name}
-                            <button type="button" onClick={() => removeTag(tag)} className="ml-1 hover:text-red-500">
-                                <X className="w-3 h-3" />
-                            </button>
-                        </Badge>
+                            #{tag.name}
+                        </button>
                     ))}
                 </div>
             )}
@@ -136,7 +133,7 @@ export function TagSelector({ selectedTags = [], onTagsChange, allowCreate = tru
                                     color: getTextColor(tag.color || "#c7c7c7"),
                                 }}
                             >
-                                {tag.name}
+                                #{tag.name}
                             </button>
                         ))}
                     </div>
@@ -150,6 +147,7 @@ export function TagSelector({ selectedTags = [], onTagsChange, allowCreate = tru
                         <h4 className="text-sm font-medium mb-2">新しいタグを作成</h4>
                         <div className="space-y-3">
                             <div className="flex gap-2">
+                                <ColorPicker color={newTagColor} onColorChange={setNewTagColor} disabled={creatingTag} />
                                 <Input
                                     value={newTagName}
                                     onChange={(e) => setNewTagName(e.target.value)}
@@ -165,10 +163,6 @@ export function TagSelector({ selectedTags = [], onTagsChange, allowCreate = tru
                                 <Button type="button" size="sm" onClick={createTag} disabled={!newTagName.trim() || creatingTag}>
                                     <Plus className="w-4 h-4" />
                                 </Button>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-600">色:</span>
-                                <ColorPicker color={newTagColor} onColorChange={setNewTagColor} disabled={creatingTag} />
                             </div>
                         </div>
                     </div>

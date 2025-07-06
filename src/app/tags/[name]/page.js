@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
+import { getTextColor } from "@/lib/utils";
 import { ArrowLeft, Edit, Hash, Save, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -117,8 +118,8 @@ export default function TagDetailPage() {
             setIsEditing(false);
             toast.success("タグを更新しました");
 
-            // URLを更新
-            router.push(`/tags/${encodeURIComponent(editData.name.trim())}`);
+            // URLを更新（ページ遷移なしで）
+            window.history.replaceState(null, "", `/tags/${encodeURIComponent(editData.name.trim())}`);
         } catch (error) {
             if (process.env.NODE_ENV === "development") {
                 console.error("Error updating tag:", error);
@@ -259,7 +260,15 @@ export default function TagDetailPage() {
                             <CardContent>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-4">
-                                        <Badge variant="secondary">{zatsugaku.length}件の雑学</Badge>
+                                        <Badge
+                                            variant="secondary"
+                                            style={{
+                                                backgroundColor: tag.color || "#c7c7c7",
+                                                color: getTextColor(tag.color || "#c7c7c7"),
+                                            }}
+                                        >
+                                            {zatsugaku.length}件の雑学
+                                        </Badge>
                                     </div>
                                 </div>
                             </CardContent>
@@ -267,7 +276,7 @@ export default function TagDetailPage() {
 
                         {/* 雑学一覧 */}
                         <div className="text-center mb-8">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-4"># {tag.name} に関連する雑学</h2>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-4">#{tag.name} に関連する雑学</h2>
                         </div>
 
                         {zatsugaku.length === 0 ? (
