@@ -37,15 +37,30 @@ function SearchPageContent() {
                         )
                     `);
 
-                // テキスト検索
+                // テキスト検索（本文のみ）
                 if (query) {
-                    supabaseQuery = supabaseQuery.or(`content.ilike.%${query}%,source.ilike.%${query}%`);
+                    supabaseQuery = supabaseQuery.ilike("content", `%${query}%`);
                 }
 
                 // タグフィルター
                 if (selectedTags.length > 0) {
                     const tagIds = selectedTags.map((tag) => tag.id);
-                    supabaseQuery = supabaseQuery.in("zatsugaku_tags.tag_id", tagIds);
+
+                    // まず、指定されたタグを持つ雑学のIDを取得
+                    const { data: tagFilterData, error: tagFilterError } = await supabase.from("zatsugaku_tags").select("zatsugaku_id").in("tag_id", tagIds);
+
+                    if (tagFilterError) throw tagFilterError;
+
+                    const zatsugakuIds = tagFilterData?.map((item) => item.zatsugaku_id) || [];
+
+                    if (zatsugakuIds.length > 0) {
+                        supabaseQuery = supabaseQuery.in("id", zatsugakuIds);
+                    } else {
+                        // タグに一致する雑学がない場合は空の結果を返す
+                        setSearchResults([]);
+                        setLoading(false);
+                        return;
+                    }
                 }
 
                 const { data, error } = await supabaseQuery.order("created_at", { ascending: false });
@@ -133,7 +148,9 @@ function SearchPageContent() {
                                     <div className="text-sm text-gray-500">
                                         {query && `キーワード: "${query}"`}
                                         {query && selectedTags.length > 0 && " + "}
-                                        {selectedTags.length > 0 && `${selectedTags.length}個のタグ`}
+                                        {selectedTags.length > 0 && (
+                                            <span>{selectedTags.length === 1 ? `タグ: "${selectedTags[0].name}"` : `タグ: ${selectedTags.map((tag) => `"${tag.name}"`).join(", ")}`}</span>
+                                        )}
                                     </div>
                                 )}
                             </div>
