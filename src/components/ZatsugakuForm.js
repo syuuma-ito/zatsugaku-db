@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
+import { sanitizeHtml } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -17,21 +18,49 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
         source: initialData?.source || "",
     });
 
+    // 入力検証関数
+    const validateInput = (data) => {
+        const errors = [];
+
+        // コンテンツの検証
+        if (!data.content.trim()) {
+            errors.push("雑学の内容を入力してください");
+        } else if (data.content.length > 10000) {
+            errors.push("雑学の内容は10,000文字以内で入力してください");
+        }
+
+        // 情報源の検証
+        if (data.source && data.source.length > 2000) {
+            errors.push("情報源は2,000文字以内で入力してください");
+        }
+
+        return errors;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!formData.content.trim()) {
-            toast.error("雑学の内容を入力してください");
+
+        // 入力検証
+        const errors = validateInput(formData);
+        if (errors.length > 0) {
+            errors.forEach((error) => toast.error(error));
             return;
         }
 
         setLoading(true);
         try {
+            // データをサニタイズ
+            const sanitizedData = {
+                content: sanitizeHtml(formData.content.trim()),
+                source: formData.source ? sanitizeHtml(formData.source.trim()) : null,
+            };
+
             if (isEdit) {
                 const { error } = await supabase
                     .from("zatsugaku")
                     .update({
-                        content: formData.content,
-                        source: formData.source,
+                        content: sanitizedData.content,
+                        source: sanitizedData.source,
                         updated_at: new Date().toISOString(),
                     })
                     .eq("id", initialData.id);
@@ -40,21 +69,14 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
                 toast.success("雑学を更新しました");
                 router.push(`/zatsugaku/${initialData.id}`);
             } else {
-                const { data, error } = await supabase
-                    .from("zatsugaku")
-                    .insert([
-                        {
-                            content: formData.content,
-                            source: formData.source,
-                        },
-                    ])
-                    .select();
+                const { data, error } = await supabase.from("zatsugaku").insert([sanitizedData]).select();
 
                 if (error) throw error;
                 toast.success("雑学を追加しました");
                 router.push(`/zatsugaku/${data[0].id}`);
             }
         } catch (error) {
+            console.error("Database error:", error);
             toast.error(isEdit ? "更新に失敗しました" : "追加に失敗しました");
         } finally {
             setLoading(false);
@@ -62,9 +84,10 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
     };
 
     const handleChange = (e) => {
+        const { name, value } = e.target;
         setFormData({
             ...formData,
-            [e.target.name]: e.target.value,
+            [name]: value,
         });
     };
 
@@ -85,7 +108,10 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
                             className="w-full mt-1 p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                             rows={6}
                             required
+                            maxLength={10000}
+                            placeholder="雑学の内容を入力してください"
                         />
+                        <div className="text-sm text-gray-500 mt-1">{formData.content.length}/10,000文字</div>
                     </div>
 
                     <div>
@@ -98,7 +124,9 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
                             placeholder="参考文献やWebサイトなど"
                             className="w-full mt-1 p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                             rows={3}
+                            maxLength={2000}
                         />
+                        <div className="text-sm text-gray-500 mt-1">{formData.source.length}/2,000文字</div>
                     </div>
 
                     <div className="flex justify-end space-x-2">

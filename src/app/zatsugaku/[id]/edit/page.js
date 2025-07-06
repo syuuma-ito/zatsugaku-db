@@ -19,10 +19,21 @@ export default function EditZatsugakuPage() {
             try {
                 const { data, error } = await supabase.from("zatsugaku").select("*").eq("id", params.id).single();
 
-                if (error) throw error;
-                setZatsugaku(data);
+                if (error) {
+                    if (error.code === "PGRST116") {
+                        // データが見つからない場合
+                        setZatsugaku(null);
+                    } else {
+                        throw error;
+                    }
+                } else {
+                    setZatsugaku(data);
+                }
             } catch (error) {
-                console.error("Error fetching zatsugaku:", error);
+                // エラーログは開発環境でのみ出力
+                if (process.env.NODE_ENV === "development") {
+                    console.error("Error fetching zatsugaku:", error);
+                }
                 toast.error("雑学の取得に失敗しました");
             } finally {
                 setDataLoading(false);

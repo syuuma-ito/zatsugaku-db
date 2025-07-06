@@ -25,7 +25,12 @@ function SearchPageContent() {
                 if (error) throw error;
                 setSearchResults(data || []);
             } catch (error) {
-                console.error("Error searching zatsugaku:", error);
+                // エラーログは開発環境でのみ出力
+                if (process.env.NODE_ENV === "development") {
+                    console.error("Error searching zatsugaku:", error);
+                }
+                // 検索エラーの場合は空の結果を表示
+                setSearchResults([]);
             } finally {
                 setLoading(false);
             }

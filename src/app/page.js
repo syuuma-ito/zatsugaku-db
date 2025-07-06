@@ -22,7 +22,12 @@ export default function Home() {
                 if (error) throw error;
                 setRecentZatsugaku(data || []);
             } catch (error) {
-                console.error("Error fetching recent zatsugaku:", error);
+                // エラーログは開発環境でのみ出力
+                if (process.env.NODE_ENV === "development") {
+                    console.error("Error fetching recent zatsugaku:", error);
+                }
+                // エラーの場合は空の配列を設定
+                setRecentZatsugaku([]);
             } finally {
                 setLoading(false);
             }
