@@ -37,19 +37,20 @@ export function getTextColor(backgroundColor) {
 
 // プリセットカラー
 export const PRESET_COLORS = [
-    "#3B82F6", // blue
-    "#EF4444", // red
-    "#10B981", // green
-    "#F59E0B", // yellow
-    "#8B5CF6", // purple
-    "#F97316", // orange
-    "#06B6D4", // cyan
-    "#EC4899", // pink
-    "#84CC16", // lime
-    "#6B7280", // gray
-    "#DC2626", // dark red
-    "#059669", // dark green
-    "#D97706", // dark yellow
-    "#7C3AED", // dark purple
-    "#EA580C", // dark orange
+    "#f28b82", // 赤: ソフトレッド（Soft Red）
+    "#fbbd75", // オレンジ: アプリコット（Apricot）
+    "#fff475", // 黄色: ソフトイエロー（Soft Yellow）
+    "#e6ee9c", // 黄緑: ライトライム（Light Lime）
+    "#b5e7a0", // 黄緑: ミントグリーン（Mint Green）
+    "#81c995", // 緑: ソフトグリーン（Soft Green）
+    "#a7ffeb", // 水色: ペールターコイズ（Pale Turquoise）
+    "#90e0f3", // 青: ベビーブルー（Baby Blue）
+    "#aecbfa", // 青: ソフトブルー（Soft Blue）
+    "#c5b3f6", // 紫: ソフトバイオレット（Soft Violet）
+    "#f3b0c3", // ピンク: ローズピンク（Rose Pink）
+
+    "#f5f5f5", // グレー1: ごく淡いグレー（Very Light Gray）
+    "#dcdcdc", // グレー2: ライトグレー（Light Gray）
+    "#a9a9a9", // グレー3: ダークグレー（Dark Gray）
+    "#696969", // グレー4: もっと暗いグレー（Darker Gray）
 ];

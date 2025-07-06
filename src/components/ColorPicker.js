@@ -39,7 +39,7 @@ export default function ColorPicker({ color, onColorChange, disabled = false }) 
                     </div>
 
                     <div className="mt-3 pt-3 border-t">
-                        <label className="block text-xs text-gray-600 mb-1">カスタムカラー</label>
+                        <label className="block text-xs text-gray-800 mb-1">カスタムカラー</label>
                         <input type="color" value={color} onChange={(e) => onColorChange(e.target.value)} className="w-full h-8 rounded border border-gray-300 cursor-pointer" />
                     </div>
                 </div>
