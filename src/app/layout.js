@@ -1,16 +1,12 @@
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Zen_Kaku_Gothic_New } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-    variable: "--font-geist-sans",
+const zenKakuGothicNew = Zen_Kaku_Gothic_New({
+    variable: "--font-zen-kaku-gothic-new",
     subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-    variable: "--font-geist-mono",
-    subsets: ["latin"],
+    weight: ["400"],
 });
 
 export const metadata = {
@@ -21,7 +17,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
     return (
         <html lang="ja">
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+            <body className={`${zenKakuGothicNew.variable} antialiased`}>
                 <AuthProvider>
                     {children}
                     <Toaster />

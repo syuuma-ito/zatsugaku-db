@@ -147,7 +147,7 @@ function SearchPageContent() {
                             </div>
 
                             {hasActiveFilters && (
-                                <div className="text-sm text-gray-500">
+                                <div className="text-sm text-gray-500 mb-4">
                                     {query && `キーワード: "${query}"`}
                                     {query && selectedTags.length > 0 && " + "}
                                     {selectedTags.length > 0 && (
