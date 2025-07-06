@@ -74,7 +74,7 @@ export function Header() {
                         {isDropdownOpen && (
                             <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50">
                                 <div className="py-1">
-                                    <div className="px-4 py-3 text-sm text-gray-600 border border-gray-200 bg-gray-50 rounded-lg">
+                                    <div className="px-4 py-3 text-sm text-gray-600">
                                         <div className="text-xs text-gray-500 mb-1">ログイン中</div>
                                         <div className="font-medium">{user.email}</div>
                                     </div>
