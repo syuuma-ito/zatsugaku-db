@@ -176,7 +176,7 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
                             rows={6}
                             required
                             maxLength={10000}
-                            placeholder="雑学の内容を入力してください（最大10,000文字）"
+                            placeholder="雑学の内容を入力してください"
                         />
                         <div className="text-sm text-gray-500 mt-1">{formData.content.length}/10,000文字</div>
                     </div>
@@ -188,7 +188,7 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
                             name="source"
                             value={formData.source}
                             onChange={handleChange}
-                            placeholder="参考文献やWebサイトなど（最大2,000文字）"
+                            placeholder="参考文献やWebサイトなど"
                             className="w-full mt-1 p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
                             rows={3}
                             maxLength={2000}

@@ -218,14 +218,16 @@ export default function TagDetailPage() {
                             <CardHeader>
                                 <div className="flex justify-between items-start">
                                     <CardTitle className="text-2xl flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded" style={{ backgroundColor: tag.color || "#c7c7c7" }} />
                                         {isEditing ? (
                                             <div className="flex items-center gap-2">
-                                                <Input value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} className="w-48" maxLength={50} />
                                                 <ColorPicker color={editData.color} onColorChange={(color) => setEditData({ ...editData, color })} />
+                                                <Input value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} maxLength={50} />
                                             </div>
                                         ) : (
-                                            <span>#{tag.name}</span>
+                                            <>
+                                                <div className="w-8 h-8 rounded" style={{ backgroundColor: tag.color || "#c7c7c7" }} />
+                                                <span>#{tag.name}</span>
+                                            </>
                                         )}
                                     </CardTitle>
                                     {user && (
@@ -233,23 +235,23 @@ export default function TagDetailPage() {
                                             {isEditing ? (
                                                 <>
                                                     <Button variant="outline" size="sm" onClick={handleSave}>
-                                                        <Save className="w-4 h-4 mr-2" />
-                                                        保存
+                                                        <Save className="w-4 h-4 sm:mr-2" />
+                                                        <span className="hidden sm:inline">保存</span>
                                                     </Button>
                                                     <Button variant="outline" size="sm" onClick={handleCancel}>
-                                                        <X className="w-4 h-4 mr-2" />
-                                                        キャンセル
+                                                        <X className="w-4 h-4 sm:mr-2" />
+                                                        <span className="hidden sm:inline">キャンセル</span>
                                                     </Button>
                                                 </>
                                             ) : (
                                                 <>
                                                     <Button variant="outline" size="sm" onClick={handleEdit}>
-                                                        <Edit className="w-4 h-4 mr-2" />
-                                                        編集
+                                                        <Edit className="w-4 h-4 sm:mr-2" />
+                                                        <span className="hidden sm:inline">編集</span>
                                                     </Button>
                                                     <Button variant="outline" size="sm" onClick={handleDeleteClick} className="text-red-500 hover:text-red-700 hover:bg-red-50">
-                                                        <Trash2 className="w-4 h-4 mr-2" />
-                                                        削除
+                                                        <Trash2 className="w-4 h-4 sm:mr-2" />
+                                                        <span className="hidden sm:inline">削除</span>
                                                     </Button>
                                                 </>
                                             )}
