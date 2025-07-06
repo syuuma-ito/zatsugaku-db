@@ -17,10 +17,32 @@ export default function Home() {
     useEffect(() => {
         const fetchRecentZatsugaku = async () => {
             try {
-                const { data, error } = await supabase.from("zatsugaku").select("*").order("created_at", { ascending: false }).limit(6);
+                const { data, error } = await supabase
+                    .from("zatsugaku")
+                    .select(
+                        `
+                        *,
+                        zatsugaku_tags (
+                            tags (
+                                id,
+                                name,
+                                color
+                            )
+                        )
+                    `
+                    )
+                    .order("created_at", { ascending: false })
+                    .limit(6);
 
                 if (error) throw error;
-                setRecentZatsugaku(data || []);
+
+                // タグデータを整形
+                const zatsugakuWithTags = (data || []).map((item) => ({
+                    ...item,
+                    tags: item.zatsugaku_tags?.map((tagItem) => tagItem.tags) || [],
+                }));
+
+                setRecentZatsugaku(zatsugakuWithTags);
             } catch (error) {
                 // エラーログは開発環境でのみ出力
                 if (process.env.NODE_ENV === "development") {

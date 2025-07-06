@@ -1,6 +1,7 @@
 "use client";
 
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
+import { TagList } from "@/components/TagList";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
@@ -60,6 +61,10 @@ export function ZatsugakuCard({ zatsugaku, onDelete }) {
             <Card className="hover:shadow-md transition-shadow">
                 <CardContent>
                     <p className="text-gray-700 mb-3 line-clamp-3">{zatsugaku.content}</p>
+
+                    {/* タグの表示 */}
+                    <TagList tags={zatsugaku.tags} className="mb-3" />
+
                     <p className="text-xs text-gray-400 mt-2">最終更新: {formatDate(zatsugaku.updated_at)}</p>
                 </CardContent>
                 <CardFooter className="flex justify-between">

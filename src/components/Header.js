@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { ChevronDown, LogOut, Plus, Search, User } from "lucide-react";
+import { ChevronDown, Hash, LogOut, Plus, Search, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -45,15 +45,22 @@ export function Header() {
                     </Link>
 
                     <nav className="flex items-center space-x-4">
+                        <Link href="/search">
+                            <Button variant="ghost" size="sm">
+                                <Search className="w-4 h-4 mr-2" />
+                                検索
+                            </Button>
+                        </Link>
+
+                        <Link href="/tags">
+                            <Button variant="ghost" size="sm">
+                                <Hash className="w-4 h-4 mr-2" />
+                                タグ
+                            </Button>
+                        </Link>
+
                         {user ? (
                             <>
-                                <Link href="/search">
-                                    <Button variant="ghost" size="sm">
-                                        <Search className="w-4 h-4 mr-2" />
-                                        検索
-                                    </Button>
-                                </Link>
-
                                 <Link href="/zatsugaku/new">
                                     <Button variant="outline" size="sm">
                                         <Plus className="w-4 h-4 mr-2" />
@@ -83,20 +90,11 @@ export function Header() {
                                 </div>
                             </>
                         ) : (
-                            <>
-                                <Link href="/search">
-                                    <Button variant="ghost" size="sm">
-                                        <Search className="w-4 h-4 mr-2" />
-                                        検索
-                                    </Button>
-                                </Link>
-
-                                <Link href="/login">
-                                    <Button variant="outline" size="sm">
-                                        ログイン
-                                    </Button>
-                                </Link>
-                            </>
+                            <Link href="/login">
+                                <Button variant="outline" size="sm">
+                                    ログイン
+                                </Button>
+                            </Link>
                         )}
                     </nav>
                 </div>

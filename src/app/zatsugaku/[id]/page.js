@@ -2,6 +2,7 @@
 
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { Header } from "@/components/Header";
+import { TagList } from "@/components/TagList";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -24,7 +25,22 @@ export default function ZatsugakuDetailPage() {
     useEffect(() => {
         const fetchZatsugaku = async () => {
             try {
-                const { data, error } = await supabase.from("zatsugaku").select("*").eq("id", params.id).single();
+                const { data, error } = await supabase
+                    .from("zatsugaku")
+                    .select(
+                        `
+                        *,
+                        zatsugaku_tags (
+                            tags (
+                                id,
+                                name,
+                                color
+                            )
+                        )
+                    `
+                    )
+                    .eq("id", params.id)
+                    .single();
 
                 if (error) {
                     if (error.code === "PGRST116") {
@@ -34,7 +50,12 @@ export default function ZatsugakuDetailPage() {
                         throw error;
                     }
                 } else {
-                    setZatsugaku(data);
+                    // タグデータを整形
+                    const tags = data.zatsugaku_tags?.map((item) => item.tags) || [];
+                    setZatsugaku({
+                        ...data,
+                        tags: tags,
+                    });
                 }
             } catch (error) {
                 // エラーログは開発環境でのみ出力
@@ -166,6 +187,17 @@ export default function ZatsugakuDetailPage() {
                                     <h3 className="text-lg font-semibold mb-3">内容</h3>
                                     <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">{zatsugaku.content}</p>
                                 </div>
+
+                                {/* タグの表示 */}
+                                {zatsugaku.tags && zatsugaku.tags.length > 0 && (
+                                    <>
+                                        <Separator />
+                                        <div>
+                                            <h3 className="text-lg font-semibold mb-3">タグ</h3>
+                                            <TagList tags={zatsugaku.tags} />
+                                        </div>
+                                    </>
+                                )}
 
                                 {zatsugaku.source && (
                                     <>
