@@ -144,16 +144,17 @@ function SearchPageContent() {
                         <section>
                             <div className="flex items-center justify-between mb-4">
                                 <h2 className="text-xl font-semibold text-gray-900">検索結果 ({searchResults.length}件)</h2>
-                                {hasActiveFilters && (
-                                    <div className="text-sm text-gray-500">
-                                        {query && `キーワード: "${query}"`}
-                                        {query && selectedTags.length > 0 && " + "}
-                                        {selectedTags.length > 0 && (
-                                            <span>{selectedTags.length === 1 ? `タグ: "${selectedTags[0].name}"` : `タグ: ${selectedTags.map((tag) => `"${tag.name}"`).join(", ")}`}</span>
-                                        )}
-                                    </div>
-                                )}
                             </div>
+
+                            {hasActiveFilters && (
+                                <div className="text-sm text-gray-500">
+                                    {query && `キーワード: "${query}"`}
+                                    {query && selectedTags.length > 0 && " + "}
+                                    {selectedTags.length > 0 && (
+                                        <span>{selectedTags.length === 1 ? `タグ: "${selectedTags[0].name}"` : `タグ: ${selectedTags.map((tag) => `"${tag.name}"`).join(", ")}`}</span>
+                                    )}
+                                </div>
+                            )}
 
                             {loading ? (
                                 <div className="text-center py-8">
