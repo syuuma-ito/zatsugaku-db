@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
-import { sanitizeHtml } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -85,19 +84,13 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
 
         setLoading(true);
         try {
-            // データをサニタイズ
-            const sanitizedData = {
-                content: sanitizeHtml(formData.content.trim()),
-                source: formData.source ? sanitizeHtml(formData.source.trim()) : null,
-            };
-
             if (isEdit) {
                 // 雑学を更新
                 const { error: updateError } = await supabase
                     .from("zatsugaku")
                     .update({
-                        content: sanitizedData.content,
-                        source: sanitizedData.source,
+                        content: formData.content.trim(),
+                        source: formData.source ? formData.source.trim() : null,
                         updated_at: new Date().toISOString(),
                     })
                     .eq("id", initialData.id);
@@ -123,7 +116,7 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
                 router.push(`/zatsugaku/${initialData.id}`);
             } else {
                 // 新しい雑学を作成
-                const { data: zatsugakuData, error: insertError } = await supabase.from("zatsugaku").insert([sanitizedData]).select().single();
+                const { data: zatsugakuData, error: insertError } = await supabase.from("zatsugaku").insert([formData]).select().single();
 
                 if (insertError) throw insertError;
 
