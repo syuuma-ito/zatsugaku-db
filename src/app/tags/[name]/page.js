@@ -216,12 +216,12 @@ export default function TagDetailPage() {
                         {/* タグ情報 */}
                         <Card className="mb-8">
                             <CardHeader>
-                                <div className="flex justify-between items-start">
-                                    <CardTitle className="text-2xl flex items-center gap-3">
+                                <div className="flex justify-between items-start w-full">
+                                    <CardTitle className="text-2xl flex items-center gap-3 w-full">
                                         {isEditing ? (
-                                            <div className="flex items-center gap-2">
+                                            <div className="flex items-center gap-2 w-full">
                                                 <ColorPicker color={editData.color} onColorChange={(color) => setEditData({ ...editData, color })} />
-                                                <Input value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} maxLength={50} />
+                                                <Input value={editData.name} onChange={(e) => setEditData({ ...editData, name: e.target.value })} maxLength={50} className="w-full mr-2" />
                                             </div>
                                         ) : (
                                             <>
