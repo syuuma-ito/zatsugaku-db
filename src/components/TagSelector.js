@@ -94,11 +94,11 @@ export function TagSelector({ selectedTags = [], onTagsChange, allowCreate = tru
     const availableTags = allTags.filter((tag) => !selectedTags.some((selectedTag) => selectedTag.id === tag.id));
 
     return (
-        <div className="space-y-4">
-            <Label>選択されたタグ</Label>
+        <div className="space-y-4 border p-4 rounded-lg border-gray-400">
+            <Label>選択されたタグ ({selectedTags.length} 個)</Label>
 
             {/* 選択されたタグの表示 */}
-            {selectedTags.length > 0 && (
+            {selectedTags.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                     {selectedTags.map((tag) => (
                         <button
@@ -115,10 +115,12 @@ export function TagSelector({ selectedTags = [], onTagsChange, allowCreate = tru
                         </button>
                     ))}
                 </div>
+            ) : (
+                <div className="m-16"></div>
             )}
 
             {/* 利用可能なタグの選択 */}
-            <div className="border rounded-lg p-4 bg-gray-50 border-gray-500">
+            <div className="">
                 <h4 className="text-sm font-medium mb-3">タグ一覧</h4>
                 {availableTags.length > 0 ? (
                     <div className="flex flex-wrap gap-2 mb-4">

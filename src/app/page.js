@@ -3,6 +3,7 @@
 import { Header } from "@/components/Header";
 import { SearchForm } from "@/components/SearchForm";
 import { ZatsugakuCard } from "@/components/ZatsugakuCard";
+import { ZatsugakuCardSkeleton } from "@/components/ZatsugakuCardSkeleton";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { Plus } from "lucide-react";
@@ -145,8 +146,8 @@ export default function Home() {
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">ランダムで一件表示</h2>
 
                     {randomLoading ? (
-                        <div className="text-center py-8">
-                            <p className="text-gray-500">読み込み中...</p>
+                        <div className="max-w-md mx-auto">
+                            <ZatsugakuCardSkeleton />
                         </div>
                     ) : randomZatsugaku ? (
                         <div className="max-w-md mx-auto">
@@ -165,7 +166,7 @@ export default function Home() {
 
                     {loading ? (
                         <div className="text-center py-8">
-                            <p className="text-gray-500">読み込み中...</p>
+                            <ZatsugakuCardSkeleton />
                         </div>
                     ) : recentZatsugaku.length === 0 ? (
                         <div className="text-center py-8">
