@@ -12,7 +12,9 @@ import { useEffect, useState } from "react";
 export default function Home() {
     const { supabase } = useAuth();
     const [recentZatsugaku, setRecentZatsugaku] = useState([]);
+    const [randomZatsugaku, setRandomZatsugaku] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [randomLoading, setRandomLoading] = useState(true);
 
     useEffect(() => {
         const fetchRecentZatsugaku = async () => {
@@ -55,11 +57,64 @@ export default function Home() {
             }
         };
 
+        const fetchRandomZatsugaku = async () => {
+            try {
+                // まず総数を取得
+                const { count, error: countError } = await supabase.from("zatsugaku").select("*", { count: "exact", head: true });
+
+                if (countError) throw countError;
+
+                if (count && count > 0) {
+                    // ランダムなインデックスを生成
+                    const randomIndex = Math.floor(Math.random() * count);
+
+                    // ランダムな雑学を取得
+                    const { data, error } = await supabase
+                        .from("zatsugaku")
+                        .select(
+                            `
+                            *,
+                            zatsugaku_tags (
+                                tags (
+                                    id,
+                                    name,
+                                    color
+                                )
+                            )
+                        `
+                        )
+                        .range(randomIndex, randomIndex);
+
+                    if (error) throw error;
+
+                    if (data && data.length > 0) {
+                        // タグデータを整形
+                        const zatsugakuWithTags = {
+                            ...data[0],
+                            tags: data[0].zatsugaku_tags?.map((tagItem) => tagItem.tags) || [],
+                        };
+                        setRandomZatsugaku(zatsugakuWithTags);
+                    }
+                }
+            } catch (error) {
+                if (process.env.NODE_ENV === "development") {
+                    console.error("Error fetching random zatsugaku:", error);
+                }
+            } finally {
+                setRandomLoading(false);
+            }
+        };
+
         fetchRecentZatsugaku();
+        fetchRandomZatsugaku();
     }, [supabase]);
 
     const handleDelete = (id) => {
         setRecentZatsugaku((prev) => prev.filter((item) => item.id !== id));
+        // ランダム雑学が削除された場合は、それも除去
+        if (randomZatsugaku && randomZatsugaku.id === id) {
+            setRandomZatsugaku(null);
+        }
     };
 
     return (
@@ -84,6 +139,25 @@ export default function Home() {
                         </Button>
                     </Link>
                 </div>
+
+                {/* ランダム雑学セクション */}
+                <section className="mb-12">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6">ランダムで一件表示</h2>
+
+                    {randomLoading ? (
+                        <div className="text-center py-8">
+                            <p className="text-gray-500">読み込み中...</p>
+                        </div>
+                    ) : randomZatsugaku ? (
+                        <div className="max-w-md mx-auto">
+                            <ZatsugakuCard zatsugaku={randomZatsugaku} onDelete={handleDelete} />
+                        </div>
+                    ) : (
+                        <div className="text-center py-8">
+                            <p className="text-gray-500">雑学が見つかりませんでした</p>
+                        </div>
+                    )}
+                </section>
 
                 {/* 最近追加された雑学 */}
                 <section>
