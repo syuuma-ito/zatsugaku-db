@@ -203,8 +203,8 @@ export default function ZatsugakuDetailPage() {
                                     <>
                                         <Separator />
                                         <div>
-                                            <h3 className="text-lg font-semibold mb-3">情報源</h3>
-                                            <p className="text-gray-600">{zatsugaku.source}</p>
+                                            <h3 className="text-lg font-semibold  mb-3">情報源</h3>
+                                            <p className="text-gray-600 break-words leading-relaxed">{zatsugaku.source}</p>
                                         </div>
                                     </>
                                 )}

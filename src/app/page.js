@@ -146,11 +146,11 @@ export default function Home() {
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">ランダムで一件表示</h2>
 
                     {randomLoading ? (
-                        <div className="max-w-md mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <ZatsugakuCardSkeleton />
                         </div>
                     ) : randomZatsugaku ? (
-                        <div className="max-w-md mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <ZatsugakuCard zatsugaku={randomZatsugaku} onDelete={handleDelete} />
                         </div>
                     ) : (
@@ -165,7 +165,9 @@ export default function Home() {
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">最近追加された雑学</h2>
 
                     {loading ? (
-                        <div className="text-center py-8">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <ZatsugakuCardSkeleton />
+                            <ZatsugakuCardSkeleton />
                             <ZatsugakuCardSkeleton />
                         </div>
                     ) : recentZatsugaku.length === 0 ? (
