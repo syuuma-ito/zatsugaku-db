@@ -6,12 +6,12 @@ import { ZatsugakuCard } from "@/components/ZatsugakuCard";
 import { ZatsugakuCardSkeleton } from "@/components/ZatsugakuCardSkeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 48;
 
-export default function AllZatsugakuPage() {
+function AllZatsugakuContent() {
     const { supabase } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -210,5 +210,32 @@ export default function AllZatsugakuPage() {
                 )}
             </main>
         </div>
+    );
+}
+
+export default function AllZatsugakuPage() {
+    return (
+        <Suspense
+            fallback={
+                <div className="min-h-screen bg-white">
+                    <Header />
+                    <main className="max-w-7xl mx-auto px-4 py-8">
+                        <div className="flex justify-between items-center mb-8">
+                            <div>
+                                <h1 className="text-3xl font-bold text-gray-900 mb-2">全ての雑学</h1>
+                                <p className="text-gray-600">読み込み中...</p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {Array.from({ length: ITEMS_PER_PAGE }).map((_, index) => (
+                                <ZatsugakuCardSkeleton key={index} />
+                            ))}
+                        </div>
+                    </main>
+                </div>
+            }
+        >
+            <AllZatsugakuContent />
+        </Suspense>
     );
 }
