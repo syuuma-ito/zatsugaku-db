@@ -6,7 +6,7 @@ import { ZatsugakuCard } from "@/components/ZatsugakuCard";
 import { ZatsugakuCardSkeleton } from "@/components/ZatsugakuCardSkeleton";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { Plus } from "lucide-react";
+import { List, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -133,12 +133,20 @@ export default function Home() {
                     </div>
 
                     {/* 新規追加ボタン */}
-                    <Link href="/zatsugaku/new">
-                        <Button className="mb-8">
-                            <Plus className="w-4 h-4 mr-2" />
-                            新しい雑学を追加
-                        </Button>
-                    </Link>
+                    <div className="flex justify-center space-x-4 mb-8">
+                        <Link href="/zatsugaku/new">
+                            <Button>
+                                <Plus className="w-4 h-4 mr-2" />
+                                新しい雑学を追加
+                            </Button>
+                        </Link>
+                        <Link href="/all">
+                            <Button variant="outline">
+                                <List className="w-4 h-4 mr-2" />
+                                すべての雑学を見る
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
 
                 {/* ランダム雑学セクション */}
@@ -179,6 +187,14 @@ export default function Home() {
                             {recentZatsugaku.map((zatsugaku) => (
                                 <ZatsugakuCard key={zatsugaku.id} zatsugaku={zatsugaku} onDelete={handleDelete} />
                             ))}
+                        </div>
+                    )}
+
+                    {recentZatsugaku.length > 0 && (
+                        <div className="text-center mt-8">
+                            <Link href="/all" className="text-gray-900 font-bold hover:text-gray-700 transition-colors">
+                                もっと見る →
+                            </Link>
                         </div>
                     )}
                 </section>

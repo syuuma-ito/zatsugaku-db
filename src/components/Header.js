@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
-import { ChevronDown, Hash, LogOut, Menu, Plus, Search, User } from "lucide-react";
+import { ChevronDown, Hash, List, LogOut, Menu, Plus, Search, User } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -46,6 +46,13 @@ export function Header() {
                 <Button variant="ghost" size="sm">
                     <Search className="w-4 h-4 mr-2" />
                     検索
+                </Button>
+            </Link>
+
+            <Link href="/all">
+                <Button variant="ghost" size="sm">
+                    <List className="w-4 h-4 mr-2" />
+                    全ての雑学
                 </Button>
             </Link>
 
@@ -120,6 +127,14 @@ export function Header() {
                 <Button variant="ghost" size="default" className="w-full justify-start h-12 text-base">
                     <Search className="w-5 h-5 mr-3" />
                     検索
+                </Button>
+            </Link>
+
+            {/* 全ての雑学 */}
+            <Link href="/all" onClick={onItemClick}>
+                <Button variant="ghost" size="default" className="w-full justify-start h-12 text-base">
+                    <List className="w-5 h-5 mr-3" />
+                    全ての雑学
                 </Button>
             </Link>
 
