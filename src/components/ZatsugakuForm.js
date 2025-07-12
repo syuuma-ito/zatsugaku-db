@@ -1,12 +1,13 @@
 "use client";
 
+import { SimilarZatsugaku } from "@/components/SimilarZatsugaku";
 import { TagSelector } from "@/components/TagSelector";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 export function ZatsugakuForm({ initialData = null, isEdit = false }) {
@@ -19,19 +20,13 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
     });
     const [selectedTags, setSelectedTags] = useState(initialData?.tags || []);
 
-    // 初期データがある場合、タグを取得
-    useEffect(() => {
-        if (initialData?.id) {
-            fetchZatsugakuTags(initialData.id);
-        }
-    }, [initialData?.id]);
-
-    const fetchZatsugakuTags = async (zatsugakuId) => {
-        try {
-            const { data, error } = await supabase
-                .from("zatsugaku_tags")
-                .select(
-                    `
+    const fetchZatsugakuTags = useCallback(
+        async (zatsugakuId) => {
+            try {
+                const { data, error } = await supabase
+                    .from("zatsugaku_tags")
+                    .select(
+                        `
                     tag_id,
                     tags (
                         id,
@@ -39,19 +34,28 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
                         color
                     )
                 `
-                )
-                .eq("zatsugaku_id", zatsugakuId);
+                    )
+                    .eq("zatsugaku_id", zatsugakuId);
 
-            if (error) throw error;
+                if (error) throw error;
 
-            const tags = data.map((item) => item.tags);
-            setSelectedTags(tags);
-        } catch (error) {
-            if (process.env.NODE_ENV === "development") {
-                console.error("Error fetching zatsugaku tags:", error);
+                const tags = data.map((item) => item.tags);
+                setSelectedTags(tags);
+            } catch (error) {
+                if (process.env.NODE_ENV === "development") {
+                    console.error("Error fetching zatsugaku tags:", error);
+                }
             }
+        },
+        [supabase]
+    );
+
+    // 初期データがある場合、タグを取得
+    useEffect(() => {
+        if (initialData?.id) {
+            fetchZatsugakuTags(initialData.id);
         }
-    };
+    }, [initialData?.id, fetchZatsugakuTags]);
 
     // 入力検証関数
     const validateInput = (data) => {
@@ -112,6 +116,27 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
                     if (tagError) throw tagError;
                 }
 
+                // エンベディングを更新（バックグラウンドで実行）
+                try {
+                    const embeddingResponse = await fetch("/api/embed", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            zatsugakuId: initialData.id,
+                            content: formData.content.trim(),
+                        }),
+                    });
+
+                    if (!embeddingResponse.ok && embeddingResponse.status === 401) {
+                        toast.warning("ログインしていないため、類似検索機能は利用できません");
+                    }
+                } catch (embeddingError) {
+                    // エンベディング生成の失敗は警告に留める
+                    console.warn("Failed to update embedding:", embeddingError);
+                }
+
                 toast.success("雑学を更新しました");
                 router.push(`/zatsugaku/${initialData.id}`);
             } else {
@@ -130,6 +155,27 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
                     const { error: tagError } = await supabase.from("zatsugaku_tags").insert(tagRelations);
 
                     if (tagError) throw tagError;
+                }
+
+                // エンベディングを生成（バックグラウンドで実行）
+                try {
+                    const embeddingResponse = await fetch("/api/embed", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            zatsugakuId: zatsugakuData.id,
+                            content: formData.content.trim(),
+                        }),
+                    });
+
+                    if (!embeddingResponse.ok && embeddingResponse.status === 401) {
+                        toast.warning("ログインしていないため、類似検索機能は利用できません");
+                    }
+                } catch (embeddingError) {
+                    // エンベディング生成の失敗は警告に留める
+                    console.warn("Failed to generate embedding:", embeddingError);
                 }
 
                 toast.success("雑学を追加しました");
@@ -152,55 +198,61 @@ export function ZatsugakuForm({ initialData = null, isEdit = false }) {
     };
 
     return (
-        <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-                <CardTitle>{isEdit ? "雑学を編集" : "新しい雑学を追加"}</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <Label htmlFor="content">雑学の内容 *</Label>
-                        <textarea
-                            id="content"
-                            name="content"
-                            value={formData.content}
-                            onChange={handleChange}
-                            className="w-full mt-1 p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                            rows={6}
-                            required
-                            maxLength={10000}
-                            placeholder="雑学の内容を入力してください"
-                        />
-                        <div className="text-sm text-gray-500 mt-1">{formData.content.length}/10,000文字</div>
-                    </div>
+        <>
+            <Card className="max-w-2xl mx-auto">
+                <CardHeader>
+                    <CardTitle>{isEdit ? "雑学を編集" : "新しい雑学を追加"}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        <div>
+                            <Label htmlFor="content">雑学の内容 *</Label>
+                            <textarea
+                                id="content"
+                                name="content"
+                                value={formData.content}
+                                onChange={handleChange}
+                                className="w-full mt-1 p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                                rows={6}
+                                required
+                                maxLength={10000}
+                                placeholder="雑学の内容を入力してください"
+                            />
+                            <div className="text-sm text-gray-500 mt-1">{formData.content.length}/10,000文字</div>
+                        </div>
 
-                    <div>
-                        <Label htmlFor="source">情報源</Label>
-                        <textarea
-                            id="source"
-                            name="source"
-                            value={formData.source}
-                            onChange={handleChange}
-                            placeholder="参考文献やWebサイトなど"
-                            className="w-full mt-1 p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
-                            rows={3}
-                            maxLength={2000}
-                        />
-                        <div className="text-sm text-gray-500 mt-1">{formData.source.length}/2,000文字</div>
-                    </div>
+                        <div>
+                            <Label htmlFor="source">情報源</Label>
+                            <textarea
+                                id="source"
+                                name="source"
+                                value={formData.source}
+                                onChange={handleChange}
+                                placeholder="参考文献やWebサイトなど"
+                                className="w-full mt-1 p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-gray-500 focus:border-transparent"
+                                rows={3}
+                                maxLength={2000}
+                            />
+                            <div className="text-sm text-gray-500 mt-1">{formData.source.length}/2,000文字</div>
+                        </div>
 
-                    <TagSelector selectedTags={selectedTags} onTagsChange={setSelectedTags} />
+                        <TagSelector selectedTags={selectedTags} onTagsChange={setSelectedTags} />
 
-                    <div className="flex justify-end space-x-2">
-                        <Button type="button" variant="outline" onClick={() => router.back()}>
-                            キャンセル
-                        </Button>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? "保存中..." : isEdit ? "更新" : "追加"}
-                        </Button>
-                    </div>
-                </form>
-            </CardContent>
-        </Card>
+                        <div className="flex justify-end space-x-2">
+                            <Button type="button" variant="outline" onClick={() => router.back()}>
+                                キャンセル
+                            </Button>
+                            <Button type="submit" disabled={loading}>
+                                {loading ? "保存中..." : isEdit ? "更新" : "追加"}
+                            </Button>
+                        </div>
+                    </form>
+                </CardContent>
+            </Card>
+
+            <div className="max-w-2xl mx-auto">
+                <SimilarZatsugaku currentContent={formData.content} excludeId={initialData?.id} showSearchButton={true} />
+            </div>
+        </>
     );
 }

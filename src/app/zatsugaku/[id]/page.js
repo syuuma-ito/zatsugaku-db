@@ -2,6 +2,7 @@
 
 import { DeleteConfirmDialog } from "@/components/DeleteConfirmDialog";
 import { Header } from "@/components/Header";
+import { SimilarZatsugaku } from "@/components/SimilarZatsugaku";
 import { TagList } from "@/components/TagList";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -216,6 +217,9 @@ export default function ZatsugakuDetailPage() {
                                 </div>
                             </CardContent>
                         </Card>
+
+                        {/* 似ている雑学 */}
+                        <SimilarZatsugaku currentContent={zatsugaku.content} currentSource={zatsugaku.source} excludeId={zatsugaku.id} />
                     </div>
                 </main>
             </div>

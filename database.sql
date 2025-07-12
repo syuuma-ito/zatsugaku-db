@@ -2,12 +2,14 @@
 
 -- 必要な拡張機能を有効化
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
+CREATE EXTENSION IF NOT EXISTS vector;
 
 -- 雑学テーブルの作成
 CREATE TABLE zatsugaku (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   content TEXT NOT NULL,
   source TEXT,
+  embedding vector(768), -- Gemini embedding用のベクトル列
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -43,6 +45,43 @@ CREATE TRIGGER update_zatsugaku_updated_at
   BEFORE UPDATE ON zatsugaku
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at();
+
+-- ベクトル類似度検索用のインデックス
+CREATE INDEX IF NOT EXISTS zatsugaku_embedding_idx ON zatsugaku
+USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+
+-- 雑学の類似検索関数
+CREATE OR REPLACE FUNCTION find_similar_zatsugaku(
+  query_embedding vector(768),
+  match_threshold float DEFAULT 0.78,
+  match_count int DEFAULT 5
+)
+RETURNS TABLE (
+  id uuid,
+  content text,
+  source text,
+  similarity float,
+  created_at timestamptz,
+  updated_at timestamptz
+)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    z.id,
+    z.content,
+    z.source,
+    1 - (z.embedding <=> query_embedding) as similarity,
+    z.created_at,
+    z.updated_at
+  FROM zatsugaku z
+  WHERE z.embedding IS NOT NULL
+    AND 1 - (z.embedding <=> query_embedding) > match_threshold
+  ORDER BY z.embedding <=> query_embedding
+  LIMIT match_count;
+END;
+$$;
 
 -- Row Level Security (RLS) の設定
 ALTER TABLE zatsugaku ENABLE ROW LEVEL SECURITY;

@@ -157,7 +157,7 @@ function AllZatsugakuContent() {
         <div className="min-h-screen bg-white">
             <Header />
 
-            <main className="max-w-7xl mx-auto px-4 py-8">
+            <main className="container mx-auto px-4 py-8">
                 <div className="flex justify-between items-center mb-8">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900 mb-2">全ての雑学</h1>
