@@ -9,7 +9,7 @@ CREATE TABLE zatsugaku (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   content TEXT NOT NULL,
   source TEXT,
-  embedding vector(768), -- Gemini embedding用のベクトル列
+  embedding vector(1536), -- Gemini embedding用のベクトル列
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -52,7 +52,7 @@ USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
 
 -- 雑学の類似検索関数
 CREATE OR REPLACE FUNCTION find_similar_zatsugaku(
-  query_embedding vector(768),
+  query_embedding vector(1536),
   match_threshold float DEFAULT 0.78,
   match_count int DEFAULT 5
 )

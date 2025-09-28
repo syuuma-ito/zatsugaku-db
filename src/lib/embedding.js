@@ -10,9 +10,20 @@ const initializeGemini = () => {
 };
 
 /**
+ * ベクトルを正規化する関数
+ * @param {number[]} vector - 正規化するベクトル
+ * @returns {number[]} 正規化されたベクトル
+ */
+function normalizeVector(vector) {
+    const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+    if (magnitude === 0) return vector;
+    return vector.map((val) => val / magnitude);
+}
+
+/**
  * テキストをGeminiエンベディングモデルでベクトル化
  * @param {string} text - ベクトル化するテキスト
- * @returns {Promise<number[]>} ベクトル配列
+ * @returns {Promise<number[]>} 正規化された1536次元ベクトル配列
  */
 export async function generateEmbedding(text) {
     try {
@@ -21,10 +32,20 @@ export async function generateEmbedding(text) {
             throw new Error("Gemini API key not configured");
         }
 
-        const model = ai.getGenerativeModel({ model: "text-embedding-004" });
+        const model = ai.getGenerativeModel({ model: "gemini-embedding-001" });
 
-        const result = await model.embedContent(text);
-        return result.embedding.values;
+        const result = await model.embedContent({
+            content: {
+                parts: [{ text }],
+                role: "user",
+            },
+            taskType: "SEMANTIC_SIMILARITY",
+            outputDimensionality: 1536,
+        });
+
+        // 1536次元では手動で正規化が必要
+        const normalizedEmbedding = normalizeVector(result.embedding.values);
+        return normalizedEmbedding;
     } catch (error) {
         console.error("Error generating embedding:", error);
         throw error;
